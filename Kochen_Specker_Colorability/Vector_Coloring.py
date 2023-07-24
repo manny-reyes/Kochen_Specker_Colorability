@@ -1,5 +1,5 @@
 import numpy as np
-from Primative_Well_Signed_Vectors import primitive_well_signed_solutions
+from Primative_Well_Signed_Vectors import *
 from Sum_of_Squares_and_Divisibility import *
 import math
 
@@ -13,7 +13,7 @@ def vectors_to_color(N):
     for n in set_of_factors:
         if n > 2:
             # print(n)
-            set_to_color.update(primitive_well_signed_solutions(n))
+            vec_set.update(primitive_well_signed_solutions(n))
     return vec_set
 
 def color_assignment(N):
@@ -31,16 +31,25 @@ def color_assignment(N):
         color_dict[(0, 1, -1)] = 0
 
     # vec_set = primative_well_signed_solutions(N)
-    vec_set = vectors_to_color(N)
+    vec_set = vectors_to_color(N).union(vectors_to_color(N**2))
 
+    return identify_contradiction(vec_set, color_dict)
+
+def identify_contradiction(vec_set, color_dict):
+    """Return True if all vectors (and those generated) from vec_set has been designated either a 1 
+       or 0 and False if we identify a contradiction.
+    """
     for_loop_color_dict = copy.copy(color_dict) # Create a shallow copy of color_dict to ensure the for-loop remains consistent.
 
-    for vec_sol_to_N in vec_set:
+    for v in vec_set:
         for key_vec in for_loop_color_dict.keys():
-            if np.dot (vec_sol_to_N, key_vec) == 0 and for_loop_color_dict[key_vec] == 1:
-                color_dict[vec_sol_to_N] = 0
+            if np.dot(v, key_vec) == 0 and for_loop_color_dict[key_vec] == 1:
+                if not(v in for_loop_color_dict.keys()):
+                    color_dict[v] = 0
+                elif for_loop_color_dict[v] != 0:
+                    return False
 
-                # print(f"The dot product of {vec_sol_to_N} and {key_vec} is {np.dot(vec_sol_to_N, key_vec)}!")
+            # print(f"The dot product of {v} and {key_vec} is {np.dot(v, key_vec)}!")
 
     # print("We'll now be considering the cross product of 2 black vectors!")
 
@@ -51,14 +60,15 @@ def color_assignment(N):
             if new_for_loop_color_dict[key_vec_1] == 0 and new_for_loop_color_dict[key_vec_2] == 0 and np.dot (key_vec_1, key_vec_2) == 0:
                 cross_product = np.cross(key_vec_1, key_vec_2)
                 normalized_cp = cross_product / math.gcd(*cross_product)
-                new_vec = tuple(normalized_cp)
+                # new_vec = tuple(normalized_cp)
+                new_vec = tuple(np.array(normalized_cp, dtype = int))
                 # print(f"The cross product of {key_vec_1} and {key_vec_2} is {tuple(np.cross(key_vec_1, key_vec_2))}!")
                 if new_vec in color_dict.keys() and color_dict[new_vec] != 1:
                     return False
-                else:
+                elif primitive(new_vec) and well_signed(new_vec):
                     color_dict[new_vec] = 1
 
-    return color_dict
+    return identify_contradiction(vec_set, color_dict)
 
 # Miscellaneous functions for testing.
 def pairwise_orthogonal(v, vec_set):   # v is a tuple and vec_set is a set of tuples (vectors)
