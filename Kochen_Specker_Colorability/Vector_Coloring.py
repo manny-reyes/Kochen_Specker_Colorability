@@ -1,5 +1,5 @@
 import numpy as np
-from Primative_Well_Signed_Vectors import *
+from Primitive_Well_Signed_Vectors import *
 from Sum_of_Squares_and_Divisibility import *
 import math
 
