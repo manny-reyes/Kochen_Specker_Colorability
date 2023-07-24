@@ -31,7 +31,7 @@ def color_assignment(N):
         color_dict[(0, 1, -1)] = 0
 
     # vec_set = primative_well_signed_solutions(N)
-    vec_set = vectors_to_color(N).union(vectors_to_color(N**2))
+    vec_set = vectors_to_color(N)
 
     return identify_contradiction(vec_set, color_dict)
 
@@ -47,6 +47,7 @@ def identify_contradiction(vec_set, color_dict):
                 if not(v in for_loop_color_dict.keys()):
                     color_dict[v] = 0
                 elif for_loop_color_dict[v] != 0:
+                    print(f"The contradiction occured because of {v}.")
                     return False
 
             # print(f"The dot product of {v} and {key_vec} is {np.dot(v, key_vec)}!")
@@ -64,6 +65,7 @@ def identify_contradiction(vec_set, color_dict):
                 new_vec = tuple(np.array(normalized_cp, dtype = int))
                 # print(f"The cross product of {key_vec_1} and {key_vec_2} is {tuple(np.cross(key_vec_1, key_vec_2))}!")
                 if new_vec in color_dict.keys() and color_dict[new_vec] != 1:
+                    print(f"The contradiction occured because of {new_vec}.")
                     return False
                 elif primitive(new_vec) and well_signed(new_vec):
                     color_dict[new_vec] = 1
