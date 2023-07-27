@@ -9,11 +9,11 @@ def vectors_to_color(N):
        of N.
     """
     vec_set = set()
-    set_of_factors = factorization(N)
-    for n in set_of_factors:
+    set_of_divisors = factorization(N)
+    for n in set_of_divisors:
         if n > 2:
-            # print(n)
             vec_set.update(primitive_well_signed_solutions(n))
+            # vec_set.update(sum_of_squares_solutions(n))
     return vec_set
 
 def color_assignment(N):
@@ -47,7 +47,8 @@ def identify_contradiction(vec_set, color_dict):
                 if not(v in for_loop_color_dict.keys()):
                     color_dict[v] = 0
                 elif for_loop_color_dict[v] != 0:
-                    print(f"The contradiction occured because of {v}.")
+                    print(f"A contradiction has been identified from taking the dot product of {v} and {key_vec}.")
+                    print(f"We colored the other vectors as follows: {color_dict}")
                     return False
 
             # print(f"The dot product of {v} and {key_vec} is {np.dot(v, key_vec)}!")
@@ -65,12 +66,38 @@ def identify_contradiction(vec_set, color_dict):
                 new_vec = tuple(np.array(normalized_cp, dtype = int))
                 # print(f"The cross product of {key_vec_1} and {key_vec_2} is {tuple(np.cross(key_vec_1, key_vec_2))}!")
                 if new_vec in color_dict.keys() and color_dict[new_vec] != 1:
-                    print(f"The contradiction occured because of {new_vec}.")
+                    print(f"A contradiction has been identified from coloring {new_vec}, the cross product of {key_vec_1} and {key_vec_2}.")
+                    print(f"We colored the other vectors as follows: {color_dict}")
                     return False
                 elif primitive(new_vec) and well_signed(new_vec):
+                # else:
                     color_dict[new_vec] = 1
 
+    if set(color_dict.keys()) - set(for_loop_color_dict.keys()) == set():
+        # print("The vectors that were colored in our previous iteration are:")
+        # print(for_loop_color_dict)
+
+        # print("The vectors we just colored are:")
+        # print(color_dict)
+
+        print("The vectors we have left to color are:")
+        print(vec_set - set(color_dict.keys()))
+        uncolored_vec_set = vec_set - set(color_dict.keys())
+
+        return assumption(vec_set, uncolored_vec_set, color_dict)
+
     return identify_contradiction(vec_set, color_dict)
+
+def assumption(vec_set, uncolored_vec_set, color_dict):
+    if uncolored_vec_set == set():
+        print("Every element in our original finite set of vectors has been colored.")
+        return False
+    else:
+        first_uncolored_vec = uncolored_vec_set.pop()
+        color_dict[first_uncolored_vec] = 1
+        print(f"Let's assume {first_uncolored_vec} is colored 1.")
+
+        return identify_contradiction(vec_set, color_dict)
 
 # Miscellaneous functions for testing.
 def pairwise_orthogonal(v, vec_set):   # v is a tuple and vec_set is a set of tuples (vectors)
