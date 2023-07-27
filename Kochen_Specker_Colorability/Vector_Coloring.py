@@ -64,7 +64,6 @@ def identify_contradiction(vec_set, color_dict):
                 normalized_cp = cross_product / math.gcd(*cross_product)
                 # new_vec = tuple(normalized_cp)
                 new_vec = tuple(np.array(normalized_cp, dtype = int))
-                # print(f"The cross product of {key_vec_1} and {key_vec_2} is {tuple(np.cross(key_vec_1, key_vec_2))}!")
                 if new_vec in color_dict.keys() and color_dict[new_vec] != 1:
                     print(f"A contradiction has been identified from coloring {new_vec}, the cross product of {key_vec_1} and {key_vec_2}.")
                     print(f"We colored the other vectors as follows: {color_dict}")
