@@ -68,8 +68,8 @@ def identify_contradiction(vec_set, color_dict):
                     print(f"A contradiction has been identified from coloring {new_vec}, the cross product of {key_vec_1} and {key_vec_2}.")
                     print(f"We colored the other vectors as follows: {color_dict}")
                     return False
-                elif primitive(new_vec) and well_signed(new_vec):
-                # else:
+                # elif primitive(new_vec) and well_signed(new_vec):
+                else:
                     color_dict[new_vec] = 1
 
     if set(color_dict.keys()) - set(for_loop_color_dict.keys()) == set():
@@ -93,8 +93,8 @@ def assumption(vec_set, uncolored_vec_set, color_dict):
         return False
     else:
         first_uncolored_vec = uncolored_vec_set.pop()
-        color_dict[first_uncolored_vec] = 1
-        print(f"Let's assume {first_uncolored_vec} is colored 1.")
+        color_dict[(1, 4, -1)] = 0
+        print(f"Let's assume {first_uncolored_vec} is colored 0.")
 
         return identify_contradiction(vec_set, color_dict)
 
