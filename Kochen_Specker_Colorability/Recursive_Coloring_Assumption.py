@@ -45,8 +45,11 @@ def identify_contradiction(N):
     # through is_KS_colorable_set(...) assuming each uncolored vector is assigned 0 and 1 separately
 
     elif uncolored_vec_set != set():
+        print(f"The uncolored vector set after checking whether vec_set is KS colorable w/o assumptions is {uncolored_vec_set}.")
         for v in uncolored_vec_set:
-            print(f"A new assumption branch begins with {v}.")
+            print("--------------------------------------------------------------")
+            print(f"This is the beginning of our assumption branch with {v}.")
+            print("--------------------------------------------------------------")
             if iterative_assumption(vec_set, updated_color_dict, v, 1):
                 return True
 
@@ -102,6 +105,10 @@ def iterative_assumption(vec_set, color_dict, assumption_vec, depth):
     """Return True if we identify a contradiction and False if the set of vectors (and those generated) 
        from vec_set is KS colorable.
     """
+    print("**********************************")
+    print(f"We are currently at depth {depth}.")
+    print("**********************************")
+
     color_dict_copy = copy.deepcopy(color_dict)
 
     # Let's assume v is colored 0.
@@ -150,4 +157,7 @@ def iterative_assumption(vec_set, color_dict, assumption_vec, depth):
         else:
             print("We must make additional assumptions!")
             for v in uncolored_vec_0_and_1:
-                return iterative_assumption(vec_set, color_dict_0, v, depth + 1) and iterative_assumption(vec_set, color_dict_1, v, depth + 1)
+                # print(f"The uncolored vector set following both assumptions is {uncolored_vec_0_and_1}")
+                if iterative_assumption(vec_set, color_dict_0, v, depth + 1) and iterative_assumption(vec_set, color_dict_1, v, depth + 1):
+                    return True
+            return False
