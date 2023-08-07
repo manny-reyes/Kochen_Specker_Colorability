@@ -83,7 +83,7 @@ def identify_depth_1_assumption_contradiction(vec_set, color_dict):
     # If a contradiction was reached without making any assumptions, return True.
     if not(no_assumption_return_dict[1]):
         return True
-        
+
     # Otherwise, we'll consider each uncolored vector in vec_set and run an updated color_dict
     # through is_KS_colorable_set(...) assuming each uncolored vector is assigned 0 and 1 separately
     elif uncolored_vec_set != set():
@@ -114,6 +114,12 @@ def identify_depth_1_assumption_contradiction(vec_set, color_dict):
             if not(assumption_0_return_dict[1]) and not(assumption_1_return_dict[1]):
                 return True
 
+            # If at any point our assumptions yield a KS colorable set of vectors, print them.
+            elif vec_set - set(assumption_0_return_dict[2].keys()) == set():
+               print(f"Every vector in our original finite set of vectors has been colored by assuming {v} was colored 0: {assumption_0_return_dict[2]}")
+            elif vec_set - set(assumption_1_return_dict[2].keys()) == set():
+               print(f"Every vector in our original finite set of vectors has been colored by assuming {v} was colored 1: {assumption_1_return_dict[2]}")
+        
         return False
     
     # If the set of vectors (and those generated) from vec_set is KS colorable, return False
