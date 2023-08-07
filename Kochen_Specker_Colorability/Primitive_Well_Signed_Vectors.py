@@ -1,6 +1,6 @@
 import math
-import copy
 from Sum_of_Squares_and_Divisibility import sum_of_squares_solutions
+import copy
 
 def primitive(int_vec):
     """Given a tuple, int_vec, return True if the corresponding integer vector is primative, 
@@ -10,7 +10,7 @@ def primitive(int_vec):
     return math.gcd(*int_list) == 1
 
 # This function helps up access the nonzero elements of a vector without having to iterate
-# through all of its elements.
+# through all of its elements later on.
 def nonzero_tuple(int_vec):
     """Given a tuple, int_vec, return a new tuple whose entries are the nonzero elements of 
        int_vec in the order that they appear.
@@ -25,10 +25,9 @@ def count_positive_entries(int_vec):
     """Given a tuple, int_vec, return how many positive entries it contains.
     """
     # We'll construct a list whose binary entries represent whether a corresponding element 
-    # in int_vec is positive (1) or negative (0).
+    # in int_vec is positive (1) or zero/negative (0).
     entries_list = [1 if x > 0 else 0 for x in int_vec]
 
-    # print(entries_list)
     return sum(entries_list)
 
 def well_signed(int_vec):
@@ -63,8 +62,8 @@ def primitive_well_signed_solutions(n):
     """
     vec_sol = sum_of_squares_solutions(n)
 
-    # Create a shallow copy of vec_sol to ensure the for-loop remains consistent.
-    new_vec_sol = copy.copy(vec_sol)
+    # Create a deep copy of vec_sol to ensure the for-loop remains consistent.
+    new_vec_sol = copy.deepcopy(vec_sol)
 
     for v in vec_sol:
         if not(primitive(v) and well_signed(v)):

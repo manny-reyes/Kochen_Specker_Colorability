@@ -23,6 +23,8 @@ def factorization(N):
 
 # Miscellaneous functions for testing.
 def number_of_divisors(N):
+    """Return the number of positive divisors that a positive integer, N, has.
+    """
     init_val = N
     n = copy.copy(init_val)
 
