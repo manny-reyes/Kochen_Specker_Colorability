@@ -1,0 +1,550 @@
+\documentclass[11pt]{beamer}
+\usetheme{Copenhagen}
+\usepackage{tikz}
+\usetikzlibrary{calc}
+\setbeamertemplate{caption}[numbered]
+\usepackage{tikz-3dplot}
+\usepackage{amssymb}
+\usepackage{xcolor}
+\usepackage{tikz-qtree}
+
+%--------------------------------------------------------------------
+% To get rid of the bottom navigation bars:
+\setbeamertemplate{footline}[frame number]{}
+
+% To get rid of the bottom navigation symbols:
+\setbeamertemplate{navigation symbols}{}
+
+% To get rid of the footer:
+\setbeamertemplate{footline}{}
+
+%--------------------------------------------------------------------
+\title{Kochen-Specker Systems:}
+\subtitle{An Algorithmic Approach to Proving Contradictions}
+\author{Camilo Morales}
+\institute{Department of Mathematics \\ University of California, Irvine}
+\date{}
+
+\begin{document}
+
+\tikzset{every tree node/.style={minimum width=4em,draw,circle},
+		blank/.style={draw=none},
+		edge from parent/.style=
+		{draw,edge from parent path={(\tikzparentnode) -- (\tikzchildnode)}},
+		level distance=3cm}
+
+\frame{\titlepage}
+
+%--------------------------------------------------------------------
+\begin{frame}{}
+
+\centering
+
+\Large{Vectors}
+
+\end{frame}
+
+%--------------------------------------------------------------------
+\begin{frame}{Vector Spaces}
+
+\begin{columns}
+	
+	\begin{column}{0.45\textwidth}
+	
+		\begin{figure}[htp]
+			\begin{tikzpicture}
+  				\draw[thin, gray!40] (0, 0) grid (4, 4);
+  				\draw[<->] (0, 0)--(4, 0) node[right]{$x$};
+  				\draw[<->] (0, 0)--(0, 4) node[above]{$y$};
+  				\draw[line width = 2pt, blue, -stealth] (0, 0) -- (1, 2) node[anchor = south]{$\vec{u}$};
+  				\draw[line width = 2pt, red, -stealth] (1, 2) -- (3, 3) node[anchor = south]{$\vec{v}$};
+  				\draw[line width = 2pt, purple, -stealth] let \p1 = (0, 0),
+  											 \p2 = (3, 3) in
+											 (\p1) -- (\p2) node at ({(\x2 / 2) + 10}, \y2 / 2) [anchor = north]{$\vec{u} + \vec{v}$};
+			\end{tikzpicture}
+
+			\caption{Vector Addition}
+
+		\end{figure}
+		
+	\end{column}
+	
+	\begin{column}{0.45\textwidth}
+	
+		\begin{figure}[htp]
+			\begin{tikzpicture}
+  				\draw[thin, gray!40] (0, 0) grid (4, 4);
+  				\draw[<->] (0, 0)--(4, 0) node[right]{$x$};
+  				\draw[<->] (0, 0)--(0, 4) node[above]{$y$};
+  				\draw[line width = 2pt, red, -stealth] (0, 0) -- (3, 3) node[anchor = south]{$2 \vec{u}$};
+  				\draw[line width = 2pt, blue, -stealth] (0, 0) -- (1.5, 1.5) node[anchor = south]{$\vec{u}$};
+			\end{tikzpicture}
+						
+			\caption{Scalar Multiplication}
+				
+		\end{figure}
+		
+	\end{column}
+	
+\end{columns}
+
+\end{frame}
+
+%--------------------------------------------------------------------
+\begin{frame}{Orthogonality}
+
+\centering
+
+\begin{figure}[htp]
+	\tdplotsetmaincoords{60}{110}
+	\begin{tikzpicture}[scale = 2,tdplot_main_coords]
+
+		\draw[thick,->] (0, 0, 0) -- (2, 0, 0) node[below left = -3]{$x$};
+		\draw[thick,->] (0, 0, 0) -- (0, 2, 0) node[right = -1]{$y$};
+		\draw[thick,->] (0, 0, 0) -- (0, 0, 2) node[above = -1]{$z$};
+	
+		\draw[line width = 2pt, blue, -stealth] (0, 0, 0) -- (1.5, 0, 0) node[anchor = south east]{$\vec{u}$};
+		\draw[line width = 2pt, red, -stealth] (0, 0, 0) -- (0, 1.5, 0) node[anchor = south west]{$\vec{v}$};
+		\draw[line width = 2pt, purple, -stealth] (0, 0, 0) -- (0, 0, 1.5) node[anchor = south east]{$\vec{w}$};
+
+		\draw[thick, dashed, black] (0.5, 0, 0) -- (0.5, 0, 0.5);
+		\draw[thick, dashed, black] (0.5, 0, 0.5) -- (0, 0, 0.5);
+	
+		\draw[thick, dashed, black] (0, 0, 0.5) -- (0, 0.5, 0.5);
+		\draw[thick, dashed, black] (0, 0.5, 0.5) -- (0, 0.5, 0);
+
+		\draw[thick, dashed, black] (0, 0.5, 0) -- (0.5, 0.5, 0);	
+		\draw[thick, dashed, black] (0.5, 0.5, 0) -- (0.5, 0, 0);
+	\end{tikzpicture}
+
+	\caption{$\vec{u}$, $\vec{v}$, and $\vec{w}$ are pairwise orthogonal.}
+				
+\end{figure}
+
+\end{frame}
+
+%------------------------------------------------------------------
+\begin{frame}{}
+	
+\centering
+
+\Large{The Kochen-Specker (KS) Theorem}
+	
+\end{frame}
+
+%------------------------------------------------------------------
+\begin{frame}{Coloring}
+
+\centering
+
+\tdplotsetmaincoords{60}{110}
+\begin{tikzpicture}[scale = 2,tdplot_main_coords]
+
+	\draw[thick,->] (0, 0, 0) -- (2, 0, 0) node[below left = -3]{$x$};
+	\draw[thick,->] (0, 0, 0) -- (0, 2, 0) node[right = -1]{$y$};
+	\draw[thick,->] (0, 0, 0) -- (0, 0, 2) node[above = -1]{$z$};
+	
+	\draw[line width = 2pt, gray, -stealth] (0, 0, 0) -- (1.5, 0, 0) node[anchor = south east]{$\vec{u}$};
+	\draw[line width = 2pt, gray, -stealth] (0, 0, 0) -- (0, 1.5, 0) node[anchor = south west]{$\vec{v}$};
+	\draw[line width = 2pt, gray, -stealth] (0, 0, 0) -- (0, 0, 1.5) node[anchor = south east]{$\vec{w}$};
+
+	\draw[thick, dashed, black] (0.5, 0, 0) -- (0.5, 0, 0.5);
+	\draw[thick, dashed, black] (0.5, 0, 0.5) -- (0, 0, 0.5);
+	
+	\draw[thick, dashed, black] (0, 0, 0.5) -- (0, 0.5, 0.5);
+	\draw[thick, dashed, black] (0, 0.5, 0.5) -- (0, 0.5, 0);
+
+	\draw[thick, dashed, black] (0, 0.5, 0) -- (0.5, 0.5, 0);	
+	\draw[thick, dashed, black] (0.5, 0.5, 0) -- (0.5, 0, 0);
+\end{tikzpicture}
+
+\end{frame}
+
+%------------------------------------------------------------------
+\begin{frame}{Coloring}
+
+\centering
+
+\tdplotsetmaincoords{60}{110}
+\begin{tikzpicture}[scale = 2,tdplot_main_coords]
+
+	\draw[thick,->] (0, 0, 0) -- (2, 0, 0) node[below left = -3]{$x$};
+	\draw[thick,->] (0, 0, 0) -- (0, 2, 0) node[right = -1]{$y$};
+	\draw[thick,->] (0, 0, 0) -- (0, 0, 2) node[above = -1]{$z$};
+	
+	\draw[line width = 2pt, blue, -stealth] (0, 0, 0) -- (1.5, 0, 0) node[anchor = south east]{$\vec{u}$};
+	\draw[line width = 2pt, blue, -stealth] (0, 0, 0) -- (0, 1.5, 0) node[anchor = south west]{$\vec{v}$};
+	\draw[line width = 2pt, red, -stealth] (0, 0, 0) -- (0, 0, 1.5) node[anchor = south east]{$\vec{w}$};
+
+	\draw[thick, dashed, black] (0.5, 0, 0) -- (0.5, 0, 0.5);
+	\draw[thick, dashed, black] (0.5, 0, 0.5) -- (0, 0, 0.5);
+	
+	\draw[thick, dashed, black] (0, 0, 0.5) -- (0, 0.5, 0.5);
+	\draw[thick, dashed, black] (0, 0.5, 0.5) -- (0, 0.5, 0);
+
+	\draw[thick, dashed, black] (0, 0.5, 0) -- (0.5, 0.5, 0);	
+	\draw[thick, dashed, black] (0.5, 0.5, 0) -- (0.5, 0, 0);
+\end{tikzpicture}
+
+\end{frame}
+
+%----------------------------------------------------------------
+\begin{frame}{The Kochen-Specker (KS) Theorem}
+
+Let $\mathcal{S}$ be a set of vectors and consider the value function $f: \mathcal{S} \to \{\begingroup\color{blue}{0}\endgroup, \begingroup\color{red}{1}\endgroup\}$.
+
+\pause
+
+\centering
+
+\tdplotsetmaincoords{60}{110}
+\begin{tikzpicture}[scale = 2,tdplot_main_coords]
+
+	\draw[thick,->] (0, 0, 0) -- (2, 0, 0) node[below left = -3]{$x$};
+	\draw[thick,->] (0, 0, 0) -- (0, 2, 0) node[right = -1]{$y$};
+	\draw[thick,->] (0, 0, 0) -- (0, 0, 2) node[above = -1]{$z$};
+	
+	\draw[line width = 2pt, blue, -stealth] (0, 0, 0) -- (1.5, 0, 0) node[anchor = south east]{$\vec{u}$};
+	\draw[line width = 2pt, blue, -stealth] (0, 0, 0) -- (0, 1.5, 0) node[anchor = south west]{$\vec{v}$};
+	\draw[line width = 2pt, red, -stealth] (0, 0, 0) -- (0, 0, 1.5) node[anchor = south east]{$\vec{w}$};
+
+	\draw[thick, dashed, black] (0.5, 0, 0) -- (0.5, 0, 0.5);
+	\draw[thick, dashed, black] (0.5, 0, 0.5) -- (0, 0, 0.5);
+	
+	\draw[thick, dashed, black] (0, 0, 0.5) -- (0, 0.5, 0.5);
+	\draw[thick, dashed, black] (0, 0.5, 0.5) -- (0, 0.5, 0);
+
+	\draw[thick, dashed, black] (0, 0.5, 0) -- (0.5, 0.5, 0);	
+	\draw[thick, dashed, black] (0.5, 0.5, 0) -- (0.5, 0, 0);
+\end{tikzpicture}
+
+\[f(\vec{u}) = \begingroup\color{blue}{0}\endgroup \quad f(\vec{v}) = \begingroup\color{blue}{0}\endgroup \quad f(\vec{w}) = \begingroup\color{red}{1}\endgroup\]
+\end{frame}
+
+
+%-------------------------------------------------------------------
+\begin{frame}{The Kochen-Specker (KS) Theorem}
+
+\begin{block}{Kochen-Specker, 1967}
+	There is a finite set $\mathcal{S} \subset \mathbb{R}^{3}$ such that there is no function $f: \mathcal{S} \to \{\begingroup\color{blue}{0}\endgroup, \begingroup\color{red}{1}\endgroup\}$ satisfying
+	\[f(\vec{u}) + f(\vec{v}) + f(\vec{w}) = 1\]
+	for all triples $(\vec{u}, \vec{v}, \vec{w})$ of mutually orthogonal vectors in $\mathcal{S}$.
+\end{block}
+
+\vfill
+
+$\mathbb{R}^{3} := \{(x, y, z) : x, y, z \in \mathbb{R}\}$
+
+\end{frame}
+
+%----------------------------------------------------------------
+\begin{frame}{The Kochen-Specker (KS) Theorem}
+
+\centering
+
+\begin{figure}
+	\includegraphics[width=0.65 \textwidth]{Kochen-Specker sets}
+	
+	\caption{A graphical representation of the set of 117 vectors in the original proof of the KS Theorem (Budroni et al, 2022).}
+	
+\end{figure}
+
+\end{frame}
+
+%----------------------------------------------------------------
+\begin{frame}{A Kochen-Specker (KS) System}
+
+\[\mathcal{S}(N) = \{\vec{v} = (v_{1}, v_{2}, v_{3}) \in \mathbb{Z}^{3} : v_{1}^{2} + v_{2}^{2} + v_{3}^{2} \text{ divides a power of } N\}\]
+
+\vfill
+\pause
+
+\begin{block}{Example}
+	Let $N = 30$ and suppose we want to determine whether $\vec{v} = (5, 2, 1)$ is an element of $\mathcal{S}(30)$. We verify that
+	\[5^{2} + 2^{2} + 1^{1} = 25 + 4 + 1 = 30.\]
+	Thus, $\vec{v} \in \mathcal{S}(30)$.
+\end{block}
+
+\end{frame}
+
+%--------------------------------------------------------------------
+\begin{frame}{}
+	
+\centering
+	\Large{What does our algorithm tell us?}
+	
+\end{frame}
+
+%----------------------------------------------------------------
+\begin{frame}{Contradictions}
+
+\begin{center}
+
+	\tdplotsetmaincoords{60}{110}
+	\begin{tikzpicture}[scale = 2,tdplot_main_coords]
+
+		\draw[thick,->] (0, 0, 0) -- (1.5, 0, 0) node[below left = -3]{$x$};
+		\draw[thick,->] (0, 0, 0) -- (0, 1.5, 0) node[right = -1]{$y$};
+		\draw[thick,->] (0, 0, 0) -- (0, 0, 1.5) node[above = -1]{$z$};
+	
+		\draw[line width = 2pt, red, -stealth] (0, 0, 0) -- (1, 0, 0) node[anchor = south east]{$\vec{u}$};
+		\draw[line width = 2pt, red, -stealth] (0, 0, 0) -- (0, 1, 0) node[anchor = south west]{$\vec{v}$};
+		\draw[line width = 2pt, gray, -stealth] (0, 0, 0) -- (0, 0, 1) node[anchor = south east]{$\vec{w}$};
+
+		\draw[thick, dashed, black] (0.25, 0, 0) -- (0.25, 0, 0.25);
+		\draw[thick, dashed, black] (0.25, 0, 0.25) -- (0, 0, 0.25);
+	
+		\draw[thick, dashed, black] (0, 0, 0.25) -- (0, 0.25, 0.25);
+		\draw[thick, dashed, black] (0, 0.25, 0.25) -- (0, 0.25, 0);
+
+		\draw[thick, dashed, black] (0, 0.25, 0) -- (0.25, 0.25, 0);	
+		\draw[thick, dashed, black] (0.25, 0.25, 0) -- (0.25, 0, 0);
+	\end{tikzpicture}
+	
+\end{center}
+
+\pause
+
+If $f(\vec{u}) = \begingroup\color{red}{1}\endgroup$, $f(\vec{v}) = \begingroup\color{red}{1}\endgroup$, and $f(\vec{w}) = \begingroup\color{gray}{n}\endgroup$, then
+\[f(\vec{u}) + f(\vec{v}) + f(\vec{w}) = \begingroup\color{red}{1}\endgroup + \begingroup\color{red}{1}\endgroup + \begingroup\color{gray}{n}\endgroup = 2 + \begingroup\color{gray}{n}\endgroup > 1.\]
+	
+\pause
+
+\centering
+
+\includegraphics[width=\textwidth]{Contradiction}
+
+\end{frame}
+
+%----------------------------------------------------------------
+\begin{frame}{Finite KS Colorable Sets}
+
+\begin{center}
+	\begin{tabular}{| c | c |} 
+		\hline
+		Coloring & Vectors \\
+		\hline
+		\begingroup\color{blue}{0}\endgroup 
+		& (-1, 1, 1), (0, 0, 1), (0, 1, -1), (0, 1, 0), (0, 1, 1), \\
+		& (1, -2, 1), (1, -1, 1), (1, 0, 1), (1, 1, -2), (1, 1, -1), \\
+		& (1, 1, 0), (1, 1, 1), (1, 1, 2), (1, 2, 1) \\
+		\hline
+		\begingroup\color{red}{1}\endgroup 
+		& (-2, 1, 1), (-1, 1, 2), (-1, 2, 1), (1, -1, 0), (1, -1, 2), \\
+		& (1, 0, -1), (1, 0, 0), (1, 2, -1), (2, -1, 1), (2, 1, -1), \\
+		& (2, 1, 1) \\
+		\hline
+	\end{tabular}
+	
+	\vfill
+	\pause
+	
+	\includegraphics[width=\textwidth]{Finite KS Colorable Set}
+	
+\end{center}
+
+\end{frame}
+%----------------------------------------------------------------
+\begin{frame}{Further Assumptions and Future Directions}
+
+\centering
+
+\begin{tikzpicture}
+\Tree
+	[.$\mathcal{S}(N)$     
+    	[.$f(\vec{v_{i}})=\begingroup\color{blue}{0}\endgroup$
+		]
+    	[.$f(\vec{v_{i}})=\begingroup\color{red}{1}\endgroup$
+		]
+	]
+\end{tikzpicture}
+
+\end{frame}
+
+%----------------------------------------------------------------
+\begin{frame}{Further Assumptions and Future Directions}
+
+\centering
+
+\begin{tikzpicture}
+\Tree
+	[.$\mathcal{S}(N)$     
+    	[.$f(\vec{v_{i}})=\begingroup\color{blue}{0}\endgroup$
+			[.$f(\vec{v_{j}})=\begingroup\color{blue}{0}\endgroup$
+			]
+			[.$f(\vec{v_{j}})=\begingroup\color{red}{1}\endgroup$
+			]
+		]
+    	[.$f(\vec{v_{i}})=\begingroup\color{red}{1}\endgroup$
+			[.$f(\vec{v_{j}})=\begingroup\color{blue}{0}\endgroup$
+			]
+			[.$f(\vec{v_{j}})=\begingroup\color{red}{1}\endgroup$
+			]
+		]
+	]
+\end{tikzpicture}
+
+\end{frame}
+
+%--------------------------------------------------------------------
+\begin{frame}{Acknowledgements}
+
+	\centering
+	
+	\Large{Thank you to Professor Manuel Reyes and the UCI SURF program for this opportunity!}
+	
+\end{frame}
+
+%--------------------------------------------------------------------
+\begin{frame}{References}
+
+\begin{itemize}
+
+\item Ben-Zvi, Michael, et al. "A Kochen–Specker theorem for integer matrices and noncommutative spectrum functors." Journal of Algebra 491 (2017): 280-313.
+
+\item Budroni, Costantino, et al. "Kochen-specker contextuality." Reviews of Modern Physics 94.4 (2022): 045007.
+
+\item Cortez, Ida, and Manuel L. Reyes. "A set of integer vectors with no Kochen-Specker coloring." arXiv preprint arXiv:2211.13216 (2022).
+
+\end{itemize}
+
+\end{frame}
+
+%--------------------------------------------------------------------
+{
+\setbeamercolor{background canvas}{bg=black}
+	\begin{frame}{}
+	\end{frame}
+}
+%--------------------------------------------------------------------
+{
+\setbeamercolor{background canvas}{bg=black}
+	\begin{frame}{}
+	\end{frame}
+}
+%--------------------------------------------------------------------
+\begin{frame}{Revisiting the Kochen-Specker (KS) Theorem}
+
+\begin{center}
+	\begin{tikzpicture}
+    	% Draw sets A and B
+    	\filldraw[fill=blue!20, draw=blue!60] (-2,0) ellipse (1.5 and 2.5);
+    	\filldraw[fill=red!20, draw=red!60] (2,0) ellipse (1.5 and 2.5);
+
+    	% The text above sets A and B
+    	\node (A0) at (-2, 3) {$A$};
+    	\node (B0) at (2, 3) {$v(\text{Proj}(A))$};
+
+    	% The points in sets A and B
+    	\node (A1) at (-2, 1.5) {$\mathbb{M}_{3} (\mathbb{C})$};
+    	\node (A2) at (-2, 0.75) {$\mathbb{M}_{3} (\mathbb{R})$};
+    	\node (A3) at (-2, 0) {$\mathbb{M}_{3} (\mathbb{Q})$};
+    	\node (A4) at (-2, -0.75) {$\mathbb{M}_{3} (\mathbb{Z} [1/30])$};
+    	\node (A5) at (-2, -1.5) {$\mathbb{M}_{3} (\mathbb{Z})$};
+
+    	\node (B1) at (2, 0) {$\mathbb{R}$};
+
+    	% Draw the arrows
+    	\draw[thick, ->] (A1) to [bend left = 25] node[label={[shift={(-0.05, 0)}] \begingroup\color{red}{x}\endgroup}] {} (B1);
+    	\draw[thick, ->] (A2) to [bend left = 15] node[label={[shift={(-0.075, 0)}] \begingroup\color{red}{x}\endgroup}] {} (B1);
+    	\draw[thick, ->] (A3) -- node[label={[shift={(-0.1, 0)}] \begingroup\color{red}{x}\endgroup}] {} (B1);
+    	\draw[thick, ->] (A4) to [bend right = 10] node[label={[shift={(-0.35, -0.125)}] \begingroup\color{red}{x}\endgroup}] {} (B1);
+
+	\end{tikzpicture}
+\end{center}
+
+Let $\mathbb{M}_{3} (\mathbb{Z}[1/30]) \subseteq \mathbb{M}_{3} (\mathbb{Q}) \subset \mathbb{M}_{3} (\mathbb{R}) \subset \mathbb{M}_{3} (\mathbb{C})$ be sets over which quantum mechanical observables exist and let $\mathbb{R}$ be the set over which classical quantities exist.
+
+\end{frame}
+
+%--------------------------------------------------------------------
+\begin{frame}{Revisiting the Kochen-Specker (KS) Theorem}
+
+Does there exist a set $\mathbb{Z} [1/N] \subseteq \mathbb{Z} [1/30]$ such that $\text{Proj}(\mathbb{M}_{3} (\mathbb{Z} [1/N]))$ is Kochen-Specker (KS) uncolorable?
+
+\end{frame}
+
+%--------------------------------------------------------------------
+\begin{frame}{Generalizing Orthogonality}
+
+\begin{center}
+
+	\tdplotsetmaincoords{60}{110}
+	\begin{tikzpicture}[scale = 2,tdplot_main_coords]
+
+		\draw[thick,->] (0, 0, 0) -- (1.5, 0, 0) node[below left = -3]{$x$};
+		\draw[thick,->] (0, 0, 0) -- (0, 1.5, 0) node[right = -1]{$y$};
+		\draw[thick,->] (0, 0, 0) -- (0, 0, 1.5) node[above = -1]{$z$};
+	
+		\draw[line width = 2pt, blue, -stealth] (0, 0, 0) -- (1, 0, 0) node[anchor = south east]{$(1, 0, 0)$};
+		\draw[line width = 2pt, red, -stealth] (0, 0, 0) -- (0, 1, 0) node[anchor = south west]{$(0, 1, 0)$};
+		\draw[line width = 2pt, purple, -stealth] (0, 0, 0) -- (0, 0, 1) node[anchor = south east]{$(0, 0, 1)$};
+
+		\draw[thick, dashed, black] (0.25, 0, 0) -- (0.25, 0, 0.25);
+		\draw[thick, dashed, black] (0.25, 0, 0.25) -- (0, 0, 0.25);
+	
+		\draw[thick, dashed, black] (0, 0, 0.25) -- (0, 0.25, 0.25);
+		\draw[thick, dashed, black] (0, 0.25, 0.25) -- (0, 0.25, 0);
+
+		\draw[thick, dashed, black] (0, 0.25, 0) -- (0.25, 0.25, 0);	
+		\draw[thick, dashed, black] (0.25, 0.25, 0) -- (0.25, 0, 0);
+	\end{tikzpicture}
+	
+\end{center}
+	
+\pause
+	
+Computing the dot product for each pair of vectors above will always yield 0:
+\[\begingroup\color{blue}{(1, 0, 0)}\endgroup \cdot \begingroup\color{red}{(0, 1, 0)}\endgroup = (\begingroup\color{blue}{1}\endgroup \cdot \begingroup\color{red}{0}\endgroup) + (\begingroup\color{blue}{0}\endgroup \cdot \begingroup\color{red}{1}\endgroup) + (\begingroup\color{blue}{0}\endgroup \cdot \begingroup\color{red}{0}\endgroup) = 0 + 0 + 0 = 0.\]
+		
+\end{frame}
+
+%--------------------------------------------------------------------
+\begin{frame}{Generalizing Orthogonality}
+
+Let $\vec{u} = (u_{1}, u_{2}, \dots, u_{n})$ and $\vec{v} = (v_{1}, v_{2}, \dots, v_{n})$ be nonzero vectors in the vector space $V^{n}$. Then, $\vec{u}$ and $\vec{v}$ are orthogonal if and only if
+\[\vec{u} \cdot \vec{v} = (u_{1} \cdot v_{1}) + (u_{2} \cdot v_{2}) + \cdots + (u_{n} \cdot v_{n}) = 0.\]
+\end{frame}
+
+%--------------------------------------------------------------------
+\begin{frame}{Revisiting Colorability and Uncolorability}
+
+Recall that
+\[\mathcal{S}(N) = \{\vec{v} = (v_{1}, v_{2}, v_{3}) \in \mathbb{Z}^{3} : v_{1}^{2} + v_{2}^{2} + v_{3}^{2} \text{ divides a power of } N\}.\]
+
+\vspace{1.5em}
+\pause
+
+Suppose that the positive integer $M$ divides the positive integer $N$. It follows that $\mathcal{S}(M) \subseteq \mathcal{S}(N)$. Furthermore,
+\begin{center}
+	$\mathcal{S}(N)$ colorable $\implies \mathcal{S}(M)$ colorable,
+\end{center}
+and
+\begin{center}
+	$\mathcal{S}(M)$ uncolorable $\implies \mathcal{S}(N)$ uncolorable.
+\end{center}
+
+\end{frame}
+
+%--------------------------------------------------------------------
+\begin{frame}{Revisiting Colorability and Uncolorability}
+
+Recall that
+\[\mathcal{S}(N) = \{\vec{v} = (v_{1}, v_{2}, v_{3}) \in \mathbb{Z}^{3} : v_{1}^{2} + v_{2}^{2} + v_{3}^{2} \text{ divides a power of } N\}.\]
+
+\vspace{1.5em}
+
+\begin{block}{Ben-Zvi et al., 2017}
+	If $\mathcal{S} (N)$ is KS uncolorable, then $6$ divides $N$.
+\end{block}
+
+\vspace{1.5em}
+
+\begin{block}{Bub, 1996}
+	If $30$ divides $N$, then the set $\mathcal{S} (N)$ is KS uncolorable.
+\end{block}
+
+\end{frame}
+
+%--------------------------------------------------------------------
+\end{document}
