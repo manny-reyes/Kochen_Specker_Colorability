@@ -66,6 +66,11 @@ Now, to minimize the search our algorithm must perform, we consider primitive, w
 The \texttt{Primitive\_Well\_Signed\_Vectors.py} file contains the functions \texttt{primitive} and \texttt{well\_signed}, which determine whether a tuple obtained from calling the \texttt{sum\_of\_squares\_solutions} function is primitive and well-signed. These helper functions are used in the \texttt{primitive\_well\_signed\_solutions} function, which takes as a parameter the positive integer $N$ corresponding to the set of vectors $s(N)$ and returns the set of vectors we want to color according to the Kochen-Specker Theorem.
 
 \section{The Coloring Algorithm}
+\hspace{\parindent}We developed three different Python functions that automates the coloring of our set of vectors $s(N)$. All these versions, however, have similarities that can perhaps be abstracted in subsequent modifications. Specifically, we begin our coloring process with an empty dictionary that will contain the coloring of each vector and by determining the parity of $N$. If $N$ is odd, then we add $(1, 0, 0)$, $(0, 0, 1)$, and $(0, 1, 0)$ to our dictionary. Notably, Cortez and Reyes were able to show that, without loss of generality, we can assign $(1, 0, 0)$ the value (i.e. color) $1$ while assigning $(0, 0, 1)$ and $(0, 1, 0)$ the value $0$. The reason for this is there exists a matrix such that each vector can be mapped to the each other. If $N$ is even, then we also add $(1, 0, -1)$, $(1, 0, 1)$, $(1, 1, 0)$, $(1, -1, 0)$, $(0, 1, 1)$, and $(0, 1, -1)$ to the dictionary. For similar reason as the vectors we added before, we can assign $(1, 0, -1)$ and $(1, -1, 0)$ the value $1$ and the remaining $4$ vectors the value $0$. These basis vectors allow our algorithm to follow an iterative approach that will color the remaining set of vectors in $s(N)$ by comparing their orthogonality relative to those that have already been assigned a value.
+
+\hspace{\parindent}The first thing we do is determine whether any 1-vectors in \texttt{color\_dict} are orthogonal to the vectors in $s(N)$. Recall that in a Kochen-Specker system, all triples of mutually orthogonal vectors must have exactly one vector assigned the value $1$ while the rest are assigned the value $0$. Thus, if the dot product of a $1$ vector and a vector $v \in s(N)$ yields $0$, then we will assign $v$ the value 0 and add it to \texttt{color\_dict}. If however, we find that $v$ was already in \texttt{color\_dict} and was assigned the value $1$, then the algorithm stops and returns that a contradiction has been identified. That is, any orthogonal triple containing the $1$ vector we considered and $v$ has more than one vector assigned the value $1$.
+
+Next we take the cross product of two orthogonal $0$ vectors in \texttt{color\_dict} so that we generate a third vector that is orthogonal to both 0-vectors. Since we altogether have an orthogonal triple, the vector we produced $v$ must be assigned the value $1$. If, however, we find that $v$ was already in \texttt{color\_dict} and was assigned the value $0$, then the algorithm stops and returns that a contradiction has been identified.
 
 \section{Spectral Graph Theory}
 \hspace{\parindent}Let $G = (V, E)$ be a graph where $V$ is the set of vertices representing  vectors in a Kochen-Specker system and $E$ is a set of edges between two vertices. Suppose $v_{1}, v_{2} \in V$. There exists an edge $\{v_{1}, v_{2}\} \in E$ if the integer vectors corresponding to $v_{1}$ and $v_{2}$ are orthogonal.\\
@@ -77,6 +82,9 @@ Now, let $A$ be the adjacency matrix corresponding to the graph $G$ and $\mathbf
 						0 & \text{otherwise.}
 \end{cases}\]
 We claim that the resulting vector $\mathbf{d} = A \mathbf{c}$ has entries where the $i$th entry corresponds to the number of 1 vectors adjacent to the $v_{i}$ vector.
+
+
+\[(A\mathbf{c})_{i} = \sum_{j} a_{ij} c_{i}\]
 	
 
 % --------------------------------------------------------------------
