@@ -12,4 +12,4 @@ Much of the code here addresses the problem of determining whether $\mathcal{S}_
 The Mathematica code was originally used to find an uncolorable subset of $\mathcal{S}_3(462)$. The Python code 
 was used to explore larger values of $d$ and $N$, especially showing that $\mathcal{S}_6(3)$ is KS uncolorable.
 
-There is also Python code that searches for colorings of projection matrices over the finite field $\mathbf{F}_2$.
+There is also Python code that searches for colorings of projection matrices over the finite field $\mathbb{F}_2$.
