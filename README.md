@@ -1,4 +1,4 @@
-#Kochen-Specker colorings of vectors and projections
+Kochen-Specker colorings of vectors and projections
 =====================================================
 
 This page contains code that was used to carry out computations for the paper 
