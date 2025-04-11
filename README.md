@@ -2,7 +2,7 @@ Kochen-Specker colorings of vectors and projections
 =====================================================
 
 This page contains code that was used to carry out computations for the paper 
-[Minimal ring extensions of the integers exhibiting Kochen-Specker colorability]([https://arxiv.org/abs/2211.13216](https://www.math.uci.edu/~mreyes/ks462.pdf)). 
+[Minimal ring extensions of the integers exhibiting Kochen-Specker colorability](https://www.math.uci.edu/~mreyes/ks462.pdf). 
 
 Given positive integers $d$ and $N$, we define a set 
 ```math
