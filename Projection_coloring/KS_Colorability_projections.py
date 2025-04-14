@@ -73,7 +73,7 @@ def projection_coloring(d):
     
     # Create the upper bounds and lower bounds of 1 to require that every maximal clique has a unique projection colored 1.
     upper_bound = np.ones(num_of_clqs)  
-    lower_bound = upper_bound           # For projection coloring, all cliques need to sum to one, not just maximal ones.
+    lower_bound = upper_bound           # For projection coloring, all maximal cliques need to sum to one, not just those of largest order.
 
 
     coloring_result = milp(c = np.zeros(num_of_matrices), integrality = np.ones(num_of_matrices), constraints = LinearConstraint(M, lower_bound, upper_bound))
